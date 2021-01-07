@@ -26,7 +26,12 @@
 }
 
 - (void)testRequestPermissions_userAuthorizedPermissions {
-    UNAuthorizationOptions authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    UNAuthorizationOptions authOptions;
+    if (@available(iOS 12.0, *)) {
+        authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionCriticalAlert);
+    } else {
+        authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    }
     UNNotificationSettings* settings = [UNNotificationSettings new];
     [settings setValue:@(UNAuthorizationStatusAuthorized) forKey:@"authorizationStatus"];
 
@@ -39,7 +44,12 @@
 }
 
 - (void)testRequestPermissions_userDeniedPermissions {
-    UNAuthorizationOptions authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    UNAuthorizationOptions authOptions;
+    if (@available(iOS 12.0, *)) {
+        authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionCriticalAlert);
+    } else {
+        authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    }
     UNNotificationSettings* settings = [UNNotificationSettings new];
     [settings setValue:@(UNAuthorizationStatusDenied) forKey:@"authorizationStatus"];
     
