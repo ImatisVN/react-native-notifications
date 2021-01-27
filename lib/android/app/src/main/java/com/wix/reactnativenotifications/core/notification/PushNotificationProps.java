@@ -18,6 +18,14 @@ public class PushNotificationProps {
         return getBundleStringFirstNotNull("gcm.notification.body", "body");
     }
 
+    public String getGuid() {
+        return getBundleStringFirstNotNull("message", "guid");
+    }
+
+    public String getSound() {
+        return getBundleStringFirstNotNull("alertsound", "sound");
+    }
+
     public Bundle asBundle() {
         return (Bundle) mBundle.clone();
     }

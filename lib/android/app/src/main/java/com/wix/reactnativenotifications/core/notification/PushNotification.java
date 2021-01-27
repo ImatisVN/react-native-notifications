@@ -4,8 +4,10 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -86,6 +88,10 @@ public class PushNotification implements IPushNotification {
     protected int postNotification(Integer notificationId) {
         final PendingIntent pendingIntent = getCTAPendingIntent();
         final Notification notification = buildNotification(pendingIntent);
+        if (mNotificationProps.getGuid().equals("-1")) {
+            cancelAllNotifications();
+            return -1;
+        }
         return postNotification(notification, notificationId);
     }
 
@@ -144,15 +150,20 @@ public class PushNotification implements IPushNotification {
     }
 
     protected Notification.Builder getNotificationBuilder(PendingIntent intent) {
-
-        String CHANNEL_ID = "channel_01";
-        String CHANNEL_NAME = "Channel Name";
-
+        String CHANNEL_ID = "mobilix_01";
+        String CHANNEL_NAME = "Mobilix Channel";
+        String sound = mNotificationProps.getSound();
+        int soundResourceId = getAppResourceId(sound, "raw");
+        if (soundResourceId == 0) {
+            soundResourceId = getAppResourceId(sound.substring(0, sound.lastIndexOf('.')), "raw");
+        }
+        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ mContext.getPackageName() + "/" + soundResourceId);
         final Notification.Builder notification = new Notification.Builder(mContext)
                 .setContentTitle(mNotificationProps.getTitle())
                 .setContentText(mNotificationProps.getBody())
                 .setContentIntent(intent)
                 .setDefaults(Notification.DEFAULT_ALL)
+                .setSound(soundUri)
                 .setAutoCancel(true);
 
         setUpIcon(notification);
@@ -162,6 +173,11 @@ public class PushNotification implements IPushNotification {
                     CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT);
             final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                    .build();
+            channel.setSound(soundUri, audioAttributes);
             notificationManager.createNotificationChannel(channel);
             notification.setChannelId(CHANNEL_ID);
         }
@@ -225,5 +241,10 @@ public class PushNotification implements IPushNotification {
 
     private int getAppResourceId(String resName, String resType) {
         return mContext.getResources().getIdentifier(resName, resType, mContext.getPackageName());
+    }
+
+    protected void cancelAllNotifications() {
+        final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.cancelAll();
     }
 }
