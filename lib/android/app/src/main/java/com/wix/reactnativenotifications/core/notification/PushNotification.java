@@ -151,9 +151,12 @@ public class PushNotification implements IPushNotification {
     }
 
     protected Notification.Builder getNotificationBuilder(PendingIntent intent) {
-        String CHANNEL_ID = "mobilix_01";
-        String CHANNEL_NAME = "Mobilix Channel";
+        String CHANNEL_ID = "imatis_mobilix_01";
+        String CHANNEL_NAME = "Imatis Mobilix 01";
         String sound = mNotificationProps.getSound();
+        if (sound != null) {
+            sound = sound.toLowerCase();
+        }
         int soundResourceId = getAppResourceId(sound, "raw");
         if (soundResourceId == 0) {
             soundResourceId = getAppResourceId(sound.substring(0, sound.lastIndexOf('.')), "raw");
@@ -175,7 +178,7 @@ public class PushNotification implements IPushNotification {
                     NotificationManager.IMPORTANCE_DEFAULT);
             final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             channel.setSound(soundUri, audioAttributes);
