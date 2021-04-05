@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
@@ -168,7 +169,8 @@ public class PushNotification implements IPushNotification {
                 .setContentIntent(intent)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setSound(soundUri)
-                .setAutoCancel(true);
+                .setAutoCancel(true)
+                .setPriority(Notification.PRIORITY_HIGH);
 
         setUpIcon(notification);
 
@@ -182,6 +184,13 @@ public class PushNotification implements IPushNotification {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             channel.setSound(soundUri, audioAttributes);
+            channel.enableLights(true);
+            channel.setLightColor(Color.YELLOW);
+            channel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            channel.enableVibration(true);
+            channel.setShowBadge(true);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
             notification.setChannelId(CHANNEL_ID);
         }
