@@ -1,6 +1,6 @@
 {
   "name": "@imatis/react-native-notifications",
-  "version": "3.4.2-imatis.9",
+  "version": "3.4.2-imatis.10",
   "description": "Advanced Push Notifications (Silent, interactive notifications) for iOS & Android",
   "author": "Lidan Hifi <lidan.hifi@gmail.com>",
   "license": "MIT",
