@@ -20,7 +20,7 @@ export class NotificationAction {
   authenticationRequired: boolean;
   textInput?: NotificationTextInput;
 
-  constructor(identifier: string, activationMode: 'foreground' | 'authenticationRequired' | 'destructive', title: string, authenticationRequired: boolean, textInput?: NotificationTextInput) {
+  constructor(identifier: string, activationMode: 'background' | 'foreground' | 'authenticationRequired' | 'destructive', title: string, authenticationRequired: boolean, textInput?: NotificationTextInput) {
     this.identifier = identifier;
     this.activationMode = activationMode;
     this.title = title;

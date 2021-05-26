@@ -65,8 +65,8 @@ public class PushNotification implements IPushNotification {
     @Override
     public void onReceived() throws InvalidNotificationException {
         if (!mAppLifecycleFacade.isAppVisible()) {
-            postNotification(null);
             notifyReceivedBackgroundToJS();
+            postNotification(null);
         } else {
             notifyReceivedToJS();
         }
@@ -92,6 +92,9 @@ public class PushNotification implements IPushNotification {
         final Notification notification = buildNotification(pendingIntent);
         if (mNotificationProps.getGuid().equals("-1")) {
             cancelAllNotifications();
+            return -1;
+        }
+        if (mNotificationProps.getTitle() == null || mNotificationProps.getTitle().isEmpty()) {
             return -1;
         }
         return postNotification(notification, notificationId);
@@ -144,6 +147,7 @@ public class PushNotification implements IPushNotification {
 
     protected PendingIntent getCTAPendingIntent() {
         final Intent cta = new Intent(mContext, ProxyService.class);
+        cta.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         return NotificationIntentAdapter.createPendingNotificationIntent(mContext, cta, mNotificationProps);
     }
 
@@ -152,8 +156,8 @@ public class PushNotification implements IPushNotification {
     }
 
     protected Notification.Builder getNotificationBuilder(PendingIntent intent) {
-        String CHANNEL_ID = "imatis_mobilix_01";
-        String CHANNEL_NAME = "Imatis Mobilix 01";
+        String CHANNEL_ID = "mobilix_notification_channel";
+        String CHANNEL_NAME = "Mobilix notifications";
         String sound = mNotificationProps.getSound();
         if (sound != null) {
             sound = sound.toLowerCase();
@@ -165,9 +169,10 @@ public class PushNotification implements IPushNotification {
         Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ mContext.getPackageName() + "/" + soundResourceId);
         final Notification.Builder notification = new Notification.Builder(mContext)
                 .setContentTitle(mNotificationProps.getTitle())
+                .setTicker(mNotificationProps.getTitle())
                 .setContentText(mNotificationProps.getBody())
                 .setContentIntent(intent)
-                .setDefaults(Notification.DEFAULT_ALL)
+                .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setSound(soundUri)
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_HIGH);
@@ -184,6 +189,7 @@ public class PushNotification implements IPushNotification {
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             channel.setSound(soundUri, audioAttributes);
+            channel.setDescription(CHANNEL_NAME);
             channel.enableLights(true);
             channel.setLightColor(Color.YELLOW);
             channel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
