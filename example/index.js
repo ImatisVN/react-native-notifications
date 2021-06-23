@@ -3,7 +3,8 @@ import {
   StyleSheet,
   View,
   Text,
-  Button
+  Button,
+  Platform
 } from 'react-native';
 import React, {Component} from 'react';
 import {Notifications, NotificationAction, NotificationCategory} from 'react-native-notifications';
@@ -44,6 +45,14 @@ class NotificationsExampleApp extends Component {
 
       completion();
     });
+
+    Notifications.ios.events().appNotificationSettingsLinked(() => {
+      console.warn('App Notification Settings Linked')
+    });
+  }
+
+  requestPermissionsIos(options) {
+    Notifications.ios.registerRemoteNotifications(options);
   }
 
   requestPermissions() {
@@ -134,6 +143,11 @@ class NotificationsExampleApp extends Component {
     return (
       <View style={styles.container}>
         <Button title={'Request permissions'} onPress={this.requestPermissions} testID={'requestPermissions'} />
+        {Platform.OS === 'ios' && Platform.Version > '12.0' && (<>
+          <Button title={'Request permissions with app notification settings'} onPress={() => this.requestPermissionsIos(['ProvidesAppNotificationSettings'])} testID={'requestPermissionsWithAppSettings'} />
+          <Button title={'Request permissions with provisional'} onPress={() => this.requestPermissionsIos(['Provisional'])} testID={'requestPermissionsWithAppSettings'} />
+          <Button title={'Request permissions with app notification settings and provisional'} onPress={() => this.requestPermissionsIos(['ProvidesAppNotificationSettings', 'Provisional'])} testID={'requestPermissionsWithAppSettings'} />
+        </>)}
         <Button title={'Send local notification'} onPress={this.sendLocalNotification} testID={'sendLocalNotification'} />
         <Button title={'Remove all delivered notifications'} onPress={this.removeAllDeliveredNotifications} />
         {notifications}

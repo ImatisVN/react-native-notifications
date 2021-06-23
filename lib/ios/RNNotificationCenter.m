@@ -3,13 +3,23 @@
 
 @implementation RNNotificationCenter
 
-- (void)requestPermissions {
-    UNAuthorizationOptions authOptions;
-    if (@available(iOS 12.0, *)) {
-        authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionCriticalAlert);
-    } else {
-        authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+- (void)requestPermissions:(NSArray *)options {
+    UNAuthorizationOptions authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    if ([options count] > 0) {
+        for (NSString* option in options) {
+            if ([option isEqualToString:@"ProvidesAppNotificationSettings"]) {
+                if (@available(iOS 12.0, *)) {
+                    authOptions = authOptions | UNAuthorizationOptionProvidesAppNotificationSettings;
+                }
+            }
+            if ([option isEqualToString:@"Provisional"]) {
+                if (@available(iOS 12.0, *)) {
+                    authOptions = authOptions | UNAuthorizationOptionProvisional;
+                }
+            }
+        }
     }
+    
     [UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:authOptions completionHandler:^(BOOL granted, NSError * _Nullable error) {
         if (!error && granted) {
             [UNUserNotificationCenter.currentNotificationCenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
@@ -90,5 +100,4 @@
                   });
     }];
 }
-
 @end

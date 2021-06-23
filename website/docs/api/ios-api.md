@@ -4,11 +4,19 @@ title: iOS Specific Commands
 sidebar_label: iOS specific
 ---
 
-## requestPermissions()
-Requests notification permissions from iOS, prompting the user's dialog box.
+## registerRemoteNotifications(options?: string[])
+Requests notification permissions from iOS, prompting the user's dialog box if needed.
+
+Available options:
+- **`ProvidesAppNotificationSettings`** - An option indicating the iOS notification settings to display a button for in-app notification settings and to be [informed in the app on this event](ios-events.md#appNotificationSettingsLinked).
+- **`Provisional`** - Use provisional authorization to send notifications on a trial basis. Users can then evaluate the notifications and decide whether to authorize them.
+
 
 ```js
-Notifications.ios.requestPermissions();
+Notifications.ios.registerRemoteNotifications([
+  'ProvidesAppNotificationSettings',
+  'Provisional',
+]);
 ```
 
 ## checkPermissions()
