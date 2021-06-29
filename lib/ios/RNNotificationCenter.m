@@ -5,6 +5,9 @@
 
 - (void)requestPermissions:(NSArray *)options {
     UNAuthorizationOptions authOptions = (UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert);
+    if (@available(iOS 12.0, *)) {
+        authOptions = authOptions | UNAuthorizationOptionCriticalAlert;
+    }
     if ([options count] > 0) {
         for (NSString* option in options) {
             if ([option isEqualToString:@"ProvidesAppNotificationSettings"]) {

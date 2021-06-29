@@ -30,6 +30,16 @@ export class Commands {
     });
   }
 
+  public async getLastAction(): Promise<Notification | undefined> {
+    return this.nativeCommandsSender.getLastAction().then((payload) => {
+      if (payload) {
+        return this.notificationFactory.fromPayload(payload);
+      }
+
+      return undefined;
+    });
+  }
+
   public requestPermissions(options?: RequestPermissionsOptions[]) {
     const result = this.nativeCommandsSender.requestPermissions(options);
     return result;

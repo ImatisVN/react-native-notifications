@@ -66,6 +66,13 @@ export class NotificationsRoot {
   }
 
   /**
+   * getLastAction
+   */
+   public getLastAction(): Promise<Notification | undefined> {
+    return this.commands.getLastAction();
+  }
+
+  /**
    * setCategories
    */
   public setCategories(categories: [NotificationCategory?]) {

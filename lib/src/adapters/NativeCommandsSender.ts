@@ -7,6 +7,7 @@ import { NotificationChannel } from '../interfaces/NotificationChannel';
 
 interface NativeCommandsModule {
   getInitialNotification(): Promise<Object>;
+  getLastAction(): Promise<Object>;
   postLocalNotification(notification: Notification, id: number): void;
   requestPermissions(options?: RequestPermissionsOptions[]): void;
   abandonPermissions(): void;
@@ -42,6 +43,10 @@ export class NativeCommandsSender {
 
   getInitialNotification(): Promise<Object> {
     return this.nativeCommandsModule.getInitialNotification();
+  }
+
+  getLastAction(): Promise<Object> {
+    return this.nativeCommandsModule.getLastAction();
   }
   
   requestPermissions(options?: RequestPermissionsOptions[]) {
