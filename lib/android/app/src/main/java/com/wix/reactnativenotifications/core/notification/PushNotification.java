@@ -45,6 +45,8 @@ public class PushNotification implements IPushNotification {
         public void onAppNotVisible() {
         }
     };
+    final private String DEFAULT_CHANNEL_ID = "mobilix_notification_channel";
+    final private String DEFAULT_CHANNEL_NAME = "Mobilix notifications";
 
     public static IPushNotification get(Context context, Bundle bundle) {
         Context appContext = context.getApplicationContext();
@@ -60,6 +62,7 @@ public class PushNotification implements IPushNotification {
         mAppLaunchHelper = appLaunchHelper;
         mJsIOHelper = JsIOHelper;
         mNotificationProps = createProps(bundle);
+        initDefaultChannel(context);
     }
 
     @Override
@@ -156,8 +159,6 @@ public class PushNotification implements IPushNotification {
     }
 
     protected Notification.Builder getNotificationBuilder(PendingIntent intent) {
-        String CHANNEL_ID = "mobilix_notification_channel";
-        String CHANNEL_NAME = "Mobilix notifications";
         String sound = mNotificationProps.getSound();
         if (sound != null) {
             sound = sound.toLowerCase();
@@ -180,16 +181,13 @@ public class PushNotification implements IPushNotification {
         setUpIcon(notification);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID,
-                    CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT);
             final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                     .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                     .build();
             channel.setSound(soundUri, audioAttributes);
-            channel.setDescription(CHANNEL_NAME);
+            channel.setDescription(DEFAULT_CHANNEL_NAME);
             channel.enableLights(true);
             channel.setLightColor(Color.YELLOW);
             channel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
@@ -198,7 +196,9 @@ public class PushNotification implements IPushNotification {
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
-            notification.setChannelId(CHANNEL_ID);
+            String channelId = mNotificationProps.getChannelId();
+            NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+            notification.setChannelId(channel != null ? channelId : DEFAULT_CHANNEL_ID);
         }
 
         return notification;
@@ -265,5 +265,15 @@ public class PushNotification implements IPushNotification {
     protected void cancelAllNotifications() {
         final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
+    }
+
+    private void initDefaultChannel(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel defaultChannel = new NotificationChannel(DEFAULT_CHANNEL_ID,
+                    DEFAULT_CHANNEL_NAME,
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(defaultChannel);
+        }
     }
 }

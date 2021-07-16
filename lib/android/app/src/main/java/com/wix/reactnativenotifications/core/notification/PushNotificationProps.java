@@ -25,6 +25,10 @@ public class PushNotificationProps {
     public String getSound() {
         return getBundleStringFirstNotNull("alertsound", "sound");
     }
+    
+    public String getChannelId() {
+        return getBundleStringFirstNotNull("gcm.notification.android_channel_id", "android_channel_id");
+    }
 
     public Bundle asBundle() {
         return (Bundle) mBundle.clone();
