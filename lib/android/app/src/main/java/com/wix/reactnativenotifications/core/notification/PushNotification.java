@@ -182,6 +182,7 @@ public class PushNotification implements IPushNotification {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             String channelId = mNotificationProps.getChannelId();
+            channelId = channelId != null ? channelId : DEFAULT_CHANNEL_ID;
             NotificationChannel channel = new NotificationChannel(channelId,
                     DEFAULT_CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT);
@@ -200,7 +201,7 @@ public class PushNotification implements IPushNotification {
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             notificationManager.createNotificationChannel(channel);
-            notification.setChannelId(channel != null ? channelId : DEFAULT_CHANNEL_ID);
+            notification.setChannelId(channelId);
         }
 
         return notification;
