@@ -33,7 +33,7 @@
     [UNUserNotificationCenter.currentNotificationCenter requestAuthorizationWithOptions:authOptions completionHandler:^(BOOL granted, NSError * _Nullable error) {
         if (!error && granted) {
             [UNUserNotificationCenter.currentNotificationCenter getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized) {
+                if (settings.authorizationStatus == UNAuthorizationStatusAuthorized || settings.authorizationStatus == UNAuthorizationStatusProvisional) {
                     dispatch_async(dispatch_get_main_queue(), ^{
                         [[UIApplication sharedApplication] registerForRemoteNotifications];
                     });
@@ -109,6 +109,8 @@
             @"sound": [NSNumber numberWithBool:settings.soundSetting == UNNotificationSettingEnabled],
             @"alert": [NSNumber numberWithBool:settings.alertSetting == UNNotificationSettingEnabled],
             @"carPlay": [NSNumber numberWithBool:settings.carPlaySetting == UNNotificationSettingEnabled],
+            @"notificationCenter": [NSNumber numberWithBool:settings.notificationCenterSetting == UNNotificationSettingEnabled],
+            @"lockScreen": [NSNumber numberWithBool:settings.lockScreenSetting == UNNotificationSettingEnabled],
         }];
         if (@available(iOS 12.0, *)) {
             allSettings[@"criticalAlert"] = [NSNumber numberWithBool:settings.criticalAlertSetting == UNNotificationSettingEnabled];
