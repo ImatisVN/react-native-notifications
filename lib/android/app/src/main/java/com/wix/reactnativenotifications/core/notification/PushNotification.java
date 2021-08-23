@@ -48,8 +48,8 @@ public class PushNotification implements IPushNotification {
         public void onAppNotVisible() {
         }
     };
-    final private String DEFAULT_CHANNEL_ID = "mobilix_notification_channel";
-    final private String DEFAULT_CHANNEL_NAME = "Mobilix notifications";
+    final private String DEFAULT_CHANNEL_ID = "high-level-notifications";
+    final private String DEFAULT_CHANNEL_NAME = "High Level Notifications";
 
     public static IPushNotification get(Context context, Bundle bundle) {
         Context appContext = context.getApplicationContext();
@@ -276,7 +276,7 @@ public class PushNotification implements IPushNotification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel defaultChannel = new NotificationChannel(DEFAULT_CHANNEL_ID,
                     DEFAULT_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT);
+                    NotificationManager.IMPORTANCE_HIGH);
             defaultChannel.setDescription(DEFAULT_CHANNEL_NAME);
             defaultChannel.enableLights(true);
             defaultChannel.setLightColor(Color.YELLOW);
@@ -284,7 +284,6 @@ public class PushNotification implements IPushNotification {
             defaultChannel.enableVibration(true);
             defaultChannel.setShowBadge(true);
             defaultChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            defaultChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(defaultChannel);
         }
