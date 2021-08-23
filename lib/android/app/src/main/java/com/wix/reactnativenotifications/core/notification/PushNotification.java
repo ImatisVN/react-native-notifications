@@ -13,6 +13,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.util.Log;
 
 import com.facebook.react.bridge.ReactContext;
 import com.wix.reactnativenotifications.core.AppLaunchHelper;
@@ -27,6 +28,7 @@ import com.wix.reactnativenotifications.core.ProxyService;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_OPENED_EVENT_NAME;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_EVENT_NAME;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_BACKGROUND_EVENT_NAME;
+import static com.wix.reactnativenotifications.Defs.LOGTAG;
 
 public class PushNotification implements IPushNotification {
 
@@ -201,7 +203,7 @@ public class PushNotification implements IPushNotification {
             PowerManager.WakeLock wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "mobilix:wakelock");
             wakeLock.acquire(60000);
         } catch (Exception e) {
-            Log.d(TAG, e.getMessage());
+            Log.d(LOGTAG, e.getMessage());
         }
 
         return notification;
