@@ -12,6 +12,7 @@ import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 
 import com.facebook.react.bridge.ReactContext;
 import com.wix.reactnativenotifications.core.AppLaunchHelper;
@@ -181,27 +182,26 @@ public class PushNotification implements IPushNotification {
         setUpIcon(notification);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             String channelId = mNotificationProps.getChannelId();
             channelId = channelId != null ? channelId : DEFAULT_CHANNEL_ID;
-            NotificationChannel channel = new NotificationChannel(channelId,
-                    DEFAULT_CHANNEL_NAME,
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
-            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                    .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                    .build();
-            channel.setSound(soundUri, audioAttributes);
-            channel.setDescription(DEFAULT_CHANNEL_NAME);
-            channel.enableLights(true);
-            channel.setLightColor(Color.YELLOW);
-            channel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
-            channel.enableVibration(true);
-            channel.setShowBadge(true);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            channel.setImportance(NotificationManager.IMPORTANCE_HIGH);
-            notificationManager.createNotificationChannel(channel);
+            NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
+            if (channel != null) {
+                AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .build();
+                channel.setSound(soundUri, audioAttributes);
+            }
             notification.setChannelId(channelId);
+        }
+
+        try {
+            PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+            PowerManager.WakeLock wakeLock = pm.newWakeLock((PowerManager.SCREEN_BRIGHT_WAKE_LOCK | PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP), "mobilix:wakelock");
+            wakeLock.acquire(60000);
+        } catch (Exception e) {
+            Log.d(TAG, e.getMessage());
         }
 
         return notification;
@@ -275,6 +275,14 @@ public class PushNotification implements IPushNotification {
             NotificationChannel defaultChannel = new NotificationChannel(DEFAULT_CHANNEL_ID,
                     DEFAULT_CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_DEFAULT);
+            defaultChannel.setDescription(DEFAULT_CHANNEL_NAME);
+            defaultChannel.enableLights(true);
+            defaultChannel.setLightColor(Color.YELLOW);
+            defaultChannel.setVibrationPattern(new long[]{0, 1000, 500, 1000});
+            defaultChannel.enableVibration(true);
+            defaultChannel.setShowBadge(true);
+            defaultChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            defaultChannel.setImportance(NotificationManager.IMPORTANCE_HIGH);
             final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(defaultChannel);
         }
