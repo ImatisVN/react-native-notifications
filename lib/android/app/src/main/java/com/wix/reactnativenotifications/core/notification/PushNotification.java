@@ -162,24 +162,29 @@ public class PushNotification implements IPushNotification {
     }
 
     protected Notification.Builder getNotificationBuilder(PendingIntent intent) {
+        Uri soundUri = null;
         String sound = mNotificationProps.getSound();
         if (sound != null) {
             sound = sound.toLowerCase();
+            int soundResourceId = getAppResourceId(sound, "raw");
+            if (soundResourceId == 0) {
+                soundResourceId = getAppResourceId(sound.substring(0, sound.lastIndexOf('.')), "raw");
+            }
+            soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ mContext.getPackageName() + "/" + soundResourceId);
         }
-        int soundResourceId = getAppResourceId(sound, "raw");
-        if (soundResourceId == 0) {
-            soundResourceId = getAppResourceId(sound.substring(0, sound.lastIndexOf('.')), "raw");
-        }
-        Uri soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ mContext.getPackageName() + "/" + soundResourceId);
+
         final Notification.Builder notification = new Notification.Builder(mContext)
                 .setContentTitle(mNotificationProps.getTitle())
                 .setTicker(mNotificationProps.getTitle())
                 .setContentText(mNotificationProps.getBody())
                 .setContentIntent(intent)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setSound(soundUri)
                 .setAutoCancel(true)
                 .setPriority(Notification.PRIORITY_HIGH);
+
+        if (soundUri != null) {
+            notification.setSound(soundUri);
+        }
 
         setUpIcon(notification);
 
@@ -188,7 +193,7 @@ public class PushNotification implements IPushNotification {
             String channelId = mNotificationProps.getChannelId();
             channelId = channelId != null ? channelId : DEFAULT_CHANNEL_ID;
             NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
-            if (channel != null) {
+            if (channel != null && soundUri != null) {
                 AudioAttributes audioAttributes = new AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .setUsage(AudioAttributes.USAGE_NOTIFICATION)
