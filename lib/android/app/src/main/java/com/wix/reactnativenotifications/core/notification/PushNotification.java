@@ -164,11 +164,11 @@ public class PushNotification implements IPushNotification {
     protected Notification.Builder getNotificationBuilder(PendingIntent intent) {
         Uri soundUri = null;
         String sound = mNotificationProps.getSound();
-        if (sound != null) {
+        if (sound != null && sound != "") {
             sound = sound.toLowerCase();
             int soundResourceId = getAppResourceId(sound, "raw");
             if (soundResourceId == 0) {
-                soundResourceId = getAppResourceId(sound.substring(0, sound.lastIndexOf('.')), "raw");
+                soundResourceId = getAppResourceId(sound.split(".")[0], "raw");
             }
             soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ mContext.getPackageName() + "/" + soundResourceId);
         }
