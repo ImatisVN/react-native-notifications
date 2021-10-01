@@ -168,7 +168,11 @@ public class PushNotification implements IPushNotification {
             sound = sound.toLowerCase();
             int soundResourceId = getAppResourceId(sound, "raw");
             if (soundResourceId == 0) {
-                soundResourceId = getAppResourceId(sound.split(".")[0], "raw");
+                String[] soundSplited = sound.split(".");
+                if (soundSplited.length > 0) {
+                    String soundName = soundSplited[0];
+                    soundResourceId = getAppResourceId(soundName, "raw");
+                }
             }
             soundUri = Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"+ mContext.getPackageName() + "/" + soundResourceId);
         }
