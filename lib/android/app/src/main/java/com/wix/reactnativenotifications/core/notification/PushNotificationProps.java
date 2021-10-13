@@ -38,6 +38,22 @@ public class PushNotificationProps {
         return mBundle.containsKey("google.message_id");
     }
 
+    public Boolean getCriticalAlert() {
+        String val = mBundle.getString("criticalalert");
+        if(val != null && !val.isEmpty()){
+            return val.toLowerCase().equals("true");
+        }
+        return false;
+    }
+
+    public Double getCriticalAlertVolume() {
+        String val = mBundle.getString("criticalalertvolume");
+        if(val != null && !val.isEmpty()){
+            return Double.parseDouble(val);
+        }
+        return 0.0;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(1024);

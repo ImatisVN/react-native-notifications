@@ -168,7 +168,7 @@ public class PushNotification implements IPushNotification {
             sound = sound.toLowerCase();
             int soundResourceId = getAppResourceId(sound, "raw");
             if (soundResourceId == 0) {
-                String[] soundSplited = sound.split(".");
+                String[] soundSplited = sound.split("\\.");
                 if (soundSplited.length > 0) {
                     String soundName = soundSplited[0];
                     soundResourceId = getAppResourceId(soundName, "raw");
@@ -215,6 +215,24 @@ public class PushNotification implements IPushNotification {
             Log.d(LOGTAG, e.getMessage());
         }
 
+        if(mNotificationProps.getCriticalAlert()){
+            try {
+                MediaPlayer mMediaPlayer = new MediaPlayer();
+                mMediaPlayer.setDataSource(mContext.getApplicationContext(), soundUri);
+                mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+
+                mMediaPlayer.prepare();
+                mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    public void onPrepared(MediaPlayer arg0) {
+                        mMediaPlayer.seekTo(0);
+                        mMediaPlayer.start();
+                    }
+                });
+            } catch (Exception e) {
+                Log.d(LOGTAG, e.getMessage());
+            }
+        }
+        
         return notification;
     }
 
