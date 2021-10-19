@@ -67,7 +67,7 @@ public class PushNotification implements IPushNotification {
         mAppLaunchHelper = appLaunchHelper;
         mJsIOHelper = JsIOHelper;
         mNotificationProps = createProps(bundle);
-        initDefaultChannel(context);
+        // initDefaultChannel(context);
     }
 
     @Override
@@ -197,14 +197,10 @@ public class PushNotification implements IPushNotification {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             final NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
             String channelId = mNotificationProps.getChannelId();
-            channelId = channelId != null ? channelId : DEFAULT_CHANNEL_ID;
+            channelId = channelId != null ? channelId : DEFAULT_CHANNEL_ID + sound;
             NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
-            if (channel != null && soundUri != null) {
-                AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
-                        .build();
-                channel.setSound(soundUri, audioAttributes);
+            if (channel == null && soundUri != null) {
+                initDefaultChannel(mContext, channelId, soundUri);
             }
             notification.setChannelId(channelId);
         }
@@ -301,9 +297,9 @@ public class PushNotification implements IPushNotification {
         notificationManager.cancelAll();
     }
 
-    private void initDefaultChannel(Context context) {
+    private void initDefaultChannel(Context context, String channelId, Uri soundUri) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel defaultChannel = new NotificationChannel(DEFAULT_CHANNEL_ID,
+            NotificationChannel defaultChannel = new NotificationChannel(channelId,
                     DEFAULT_CHANNEL_NAME,
                     NotificationManager.IMPORTANCE_HIGH);
             defaultChannel.setDescription(DEFAULT_CHANNEL_NAME);
@@ -313,6 +309,13 @@ public class PushNotification implements IPushNotification {
             defaultChannel.enableVibration(true);
             defaultChannel.setShowBadge(true);
             defaultChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            if (soundUri != null) {
+                AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                        .build();
+                defaultChannel.setSound(soundUri, audioAttributes);
+            }
             final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.createNotificationChannel(defaultChannel);
         }
