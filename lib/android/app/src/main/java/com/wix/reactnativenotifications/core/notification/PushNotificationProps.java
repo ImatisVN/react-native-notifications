@@ -54,6 +54,10 @@ public class PushNotificationProps {
         return 0.0;
     }
 
+    public Boolean getOngoing() {
+        return mBundle.getBoolean("ongoing");
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder(1024);

@@ -186,7 +186,8 @@ public class PushNotification implements IPushNotification {
                 .setContentIntent(intent)
                 .setDefaults(Notification.DEFAULT_VIBRATE)
                 .setAutoCancel(true)
-                .setPriority(Notification.PRIORITY_HIGH);
+                .setPriority(Notification.PRIORITY_HIGH)
+                .setOngoing(mNotificationProps.getOngoing());
 
         if (soundUri != null) {
             notification.setSound(soundUri);
