@@ -71,11 +71,14 @@ public class PushNotification implements IPushNotification {
     }
 
     @Override
-    public void onReceived() throws InvalidNotificationException {
-        if (!mAppLifecycleFacade.isAppVisible()) {
-            notifyReceivedBackgroundToJS();
+    public void onReceived() {
+        ReactContext reactContext = mAppLifecycleFacade.getRunningReactContext();
+        boolean hasActiveCatalystInstance = reactContext != null && reactContext.hasActiveCatalystInstance();
+        if (!mAppLifecycleFacade.isAppVisible() || !hasActiveCatalystInstance) {
             postNotification(null);
-        } else {
+            notifyReceivedBackgroundToJS();
+        }
+        if (hasActiveCatalystInstance) {
             notifyReceivedToJS();
         }
     }
