@@ -2,6 +2,7 @@ package com.wix.reactnativenotifications;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -61,24 +62,13 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
         final IPushNotificationsDrawer notificationsDrawer = PushNotificationsDrawer.get(mApplication.getApplicationContext());
         notificationsDrawer.onNewActivity(activity);
 
-        Intent intent = activity.getIntent();
-        if (NotificationIntentAdapter.canHandleIntent(intent)) {
-            Bundle notificationData = intent.getExtras();
-            final IPushNotification pushNotification = PushNotification.get(mApplication.getApplicationContext(), notificationData);
-            if (pushNotification != null) {
-                pushNotification.onOpened();
-            }
-        }
+        callOnOpenedIfNeed(activity);
     }
 
     @Override
     public void onActivityStarted(Activity activity) {
-        Bundle bundle = activity.getIntent().getExtras();
-        if (bundle != null) {
-            PushNotificationProps props = new PushNotificationProps(bundle);
-            if (props.isFirebaseBackgroundPayload()) {
-                InitialNotificationHolder.getInstance().set(props);
-            }
+        if (InitialNotificationHolder.getInstance().get() == null) {
+            callOnOpenedIfNeed(activity);
         }
     }
 
@@ -100,5 +90,18 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
 
     @Override
     public void onActivityDestroyed(Activity activity) {
+    }
+
+    private void callOnOpenedIfNeed(Activity activity) {
+        Intent intent = activity.getIntent();
+        if (NotificationIntentAdapter.canHandleIntent(intent)) {
+            Context appContext = mApplication.getApplicationContext();
+            Bundle notificationData = NotificationIntentAdapter.cannotHandleTrampolineActivity(appContext) ?
+                    NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent) : intent.getExtras();
+            final IPushNotification pushNotification = PushNotification.get(appContext, notificationData);
+            if (pushNotification != null) {
+                pushNotification.onOpened();
+            }
+        }
     }
 }
