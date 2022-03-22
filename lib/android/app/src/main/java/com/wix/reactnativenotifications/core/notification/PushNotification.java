@@ -49,8 +49,8 @@ public class PushNotification implements IPushNotification {
         public void onAppNotVisible() {
         }
     };
-    final private String DEFAULT_CHANNEL_ID = "channel_01";
-    final private String DEFAULT_CHANNEL_NAME = "Channel Name";
+    final private String DEFAULT_CHANNEL_ID = "high-level-notifications";
+    final private String DEFAULT_CHANNEL_NAME = "High Level Notifications";
 
     public static IPushNotification get(Context context, Bundle bundle) {
         Context appContext = context.getApplicationContext();
