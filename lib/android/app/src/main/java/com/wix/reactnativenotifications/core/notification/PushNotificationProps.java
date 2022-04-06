@@ -37,6 +37,10 @@ public class PushNotificationProps {
     public boolean isFirebaseBackgroundPayload() {
         return mBundle.containsKey("google.message_id");
     }
+    
+    public boolean isDataOnlyPushNotification() {
+        return getTitle() == null && getBody() == null;
+    }
 
     public Boolean getCriticalAlert() {
         String val = mBundle.getString("criticalalert");

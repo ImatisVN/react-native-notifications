@@ -25,7 +25,6 @@ import com.wix.reactnativenotifications.core.AppLifecycleFacadeHolder;
 import com.wix.reactnativenotifications.core.InitialNotificationHolder;
 import com.wix.reactnativenotifications.core.JsIOHelper;
 import com.wix.reactnativenotifications.core.NotificationIntentAdapter;
-import com.wix.reactnativenotifications.core.ProxyService;
 
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_OPENED_EVENT_NAME;
 import static com.wix.reactnativenotifications.Defs.NOTIFICATION_RECEIVED_EVENT_NAME;
@@ -67,18 +66,15 @@ public class PushNotification implements IPushNotification {
         mAppLaunchHelper = appLaunchHelper;
         mJsIOHelper = JsIOHelper;
         mNotificationProps = createProps(bundle);
-        // initDefaultChannel(context);
+        //initDefaultChannel(context);
     }
 
     @Override
-    public void onReceived() {
-        ReactContext reactContext = mAppLifecycleFacade.getRunningReactContext();
-        boolean hasActiveCatalystInstance = reactContext != null && reactContext.hasActiveCatalystInstance();
-        if (!mAppLifecycleFacade.isAppVisible() || !hasActiveCatalystInstance) {
+    public void onReceived() throws InvalidNotificationException {
+        if (!mAppLifecycleFacade.isAppVisible()) {
             postNotification(null);
             notifyReceivedBackgroundToJS();
-        }
-        if (hasActiveCatalystInstance) {
+        } else {
             notifyReceivedToJS();
         }
     }
@@ -99,15 +95,22 @@ public class PushNotification implements IPushNotification {
     }
 
     protected int postNotification(Integer notificationId) {
-        final PendingIntent pendingIntent = getCTAPendingIntent();
+        final PendingIntent pendingIntent = NotificationIntentAdapter.createPendingNotificationIntent(mContext, mNotificationProps);;
         final Notification notification = buildNotification(pendingIntent);
+
         if (mNotificationProps.getGuid().equals("-1")) {
             cancelAllNotifications();
             return -1;
         }
+
         if (mNotificationProps.getTitle() == null || mNotificationProps.getTitle().isEmpty()) {
             return -1;
         }
+
+        if (mNotificationProps.isDataOnlyPushNotification()) {
+            return -1;
+        }
+
         return postNotification(notification, notificationId);
     }
 
@@ -154,12 +157,6 @@ public class PushNotification implements IPushNotification {
 
     protected AppVisibilityListener getIntermediateAppVisibilityListener() {
         return mAppVisibilityListener;
-    }
-
-    protected PendingIntent getCTAPendingIntent() {
-        final Intent cta = new Intent(mContext, ProxyService.class);
-        cta.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        return NotificationIntentAdapter.createPendingNotificationIntent(mContext, cta, mNotificationProps);
     }
 
     protected Notification buildNotification(PendingIntent intent) {
@@ -288,8 +285,10 @@ public class PushNotification implements IPushNotification {
     }
 
     protected void launchOrResumeApp() {
-        final Intent intent = mAppLaunchHelper.getLaunchIntent(mContext);
-        mContext.startActivity(intent);
+        if (!NotificationIntentAdapter.cannotHandleTrampolineActivity(mContext)) {
+            final Intent intent = mAppLaunchHelper.getLaunchIntent(mContext);
+            mContext.startActivity(intent);
+        }
     }
 
     private int getAppResourceId(String resName, String resType) {
