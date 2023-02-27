@@ -17,6 +17,10 @@ public class JsIOHelper {
     }
 
     public boolean sendEventToJS(String eventName, WritableMap data, ReactContext reactContext) {
+        if(!reactContext.hasActiveCatalystInstance()) {
+            return;
+        }
+
         if (reactContext != null) {
             reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, data);
             return true;
