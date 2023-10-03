@@ -58,6 +58,14 @@ public class PushNotificationProps {
         return 0.0;
     }
 
+    public Boolean getOverridemute() {
+        String val = mBundle.getString("overridemute");
+        if(val != null && !val.isEmpty()){
+            return val.toLowerCase().equals("true");
+        }
+        return false;
+    }
+
     public Boolean getOngoing() {
         return mBundle.getBoolean("ongoing");
     }

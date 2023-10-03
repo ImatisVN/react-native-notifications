@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 
 import com.facebook.react.bridge.ReactContext;
@@ -214,7 +216,7 @@ public class PushNotification implements IPushNotification {
             Log.d(LOGTAG, e.getMessage());
         }
 
-        if(mNotificationProps.getCriticalAlert()){
+        if(mNotificationProps.getCriticalAlert() || mNotificationProps.getOverridemute()){
             try {
                 MediaPlayer mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setDataSource(mContext.getApplicationContext(), soundUri);
@@ -227,6 +229,18 @@ public class PushNotification implements IPushNotification {
                         mMediaPlayer.start();
                     }
                 });
+
+                Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+                // Vibrate with wave form
+                long[] timings = new long[] { 50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200 };
+                int[] amplitudes = new int[] { 33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255 };
+                int repeatIndex = -1; // Do not repeat.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    v.vibrate(VibrationEffect.createWaveform(timings, amplitudes, repeatIndex));
+                } else {
+                    //deprecated in API 26
+                    v.vibrate(3000);
+                }
             } catch (Exception e) {
                 Log.d(LOGTAG, e.getMessage());
             }
@@ -248,7 +262,7 @@ public class PushNotification implements IPushNotification {
 
     private void setUpIconColor(Notification.Builder notification) {
         int colorResID = getAppResourceId("colorAccent", "color");
-        if (colorResID != 0 && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (colorResID != 0) {
             int color = mContext.getResources().getColor(colorResID);
             notification.setColor(color);
         }
@@ -285,7 +299,7 @@ public class PushNotification implements IPushNotification {
     }
 
     protected void launchOrResumeApp() {
-        if (!NotificationIntentAdapter.cannotHandleTrampolineActivity(mContext)) {
+        if (NotificationIntentAdapter.canHandleTrampolineActivity(mContext)) {
             final Intent intent = mAppLaunchHelper.getLaunchIntent(mContext);
             mContext.startActivity(intent);
         }
