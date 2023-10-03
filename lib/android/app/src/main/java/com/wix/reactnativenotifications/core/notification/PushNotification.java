@@ -202,8 +202,15 @@ public class PushNotification implements IPushNotification {
             String channelId = mNotificationProps.getChannelId();
             channelId = channelId != null ? channelId : DEFAULT_CHANNEL_ID + sound;
             NotificationChannel channel = notificationManager.getNotificationChannel(channelId);
-            if (channel == null && soundUri != null) {
+            if (channel == null) {
                 initDefaultChannel(mContext, channelId, soundUri);
+            } else {
+                if (soundUri != null) {
+                    AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .build();
+                    channel.setSound(soundUri, audioAttributes);
+                }
             }
             notification.setChannelId(channelId);
         }
@@ -328,7 +335,6 @@ public class PushNotification implements IPushNotification {
             defaultChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
             if (soundUri != null) {
                 AudioAttributes audioAttributes = new AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                         .build();
                 defaultChannel.setSound(soundUri, audioAttributes);
