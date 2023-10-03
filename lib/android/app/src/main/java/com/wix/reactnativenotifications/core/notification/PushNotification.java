@@ -239,11 +239,10 @@ public class PushNotification implements IPushNotification {
 
                 Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
                 // Vibrate with wave form
-                long[] timings = new long[] { 50, 50, 50, 50, 50, 100, 350, 25, 25, 25, 25, 200 };
-                int[] amplitudes = new int[] { 33, 51, 75, 113, 170, 255, 0, 38, 62, 100, 160, 255 };
-                int repeatIndex = -1; // Do not repeat.
+                long[] timings = new long[]{0, 1000, 500, 1000};
+                int amplitude = VibrationEffect.DEFAULT_AMPLITUDE;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    v.vibrate(VibrationEffect.createWaveform(timings, amplitudes, repeatIndex));
+                    v.vibrate(VibrationEffect.createWaveform(timings, amplitude));
                 } else {
                     //deprecated in API 26
                     v.vibrate(3000);
