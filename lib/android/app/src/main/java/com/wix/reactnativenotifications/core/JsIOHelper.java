@@ -18,7 +18,7 @@ public class JsIOHelper {
 
     public boolean sendEventToJS(String eventName, WritableMap data, ReactContext reactContext) {
         if(!reactContext.hasActiveCatalystInstance()) {
-            return;
+            return false;
         }
 
         if (reactContext != null) {
