@@ -230,12 +230,13 @@ public class PushNotification implements IPushNotification {
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
 
                 mMediaPlayer.prepare();
-                mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                    public void onPrepared(MediaPlayer arg0) {
-                        mMediaPlayer.seekTo(0);
-                        mMediaPlayer.start();
+                mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mMediaPlayer.release(); // Release resources when playback completes
                     }
                 });
+                mMediaPlayer.start(); // Start playback immediately after preparing
 
                 Vibrator v = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
                 // Vibrate with wave form
