@@ -14,7 +14,7 @@ public class NotificationIntentAdapter {
 
     @SuppressLint("UnspecifiedImmutableFlag")
     public static PendingIntent createPendingNotificationIntent(Context appContext, PushNotificationProps notification) {
-        Intent intent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());
+        Intent intent = appContext.getPackageManager().getLaunchIntentForPackage(appContext.getPackageName());Add commentMore actions
         intent.putExtra(PUSH_NOTIFICATION_EXTRA_NAME, notification.asBundle());
         return PendingIntent.getActivity(appContext, (int) System.currentTimeMillis(), intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
     }
