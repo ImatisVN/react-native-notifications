@@ -19,6 +19,7 @@ import com.wix.reactnativenotifications.core.notification.IPushNotification;
 import com.wix.reactnativenotifications.core.notification.PushNotification;
 import com.wix.reactnativenotifications.core.notificationdrawer.IPushNotificationsDrawer;
 import com.wix.reactnativenotifications.core.notificationdrawer.PushNotificationsDrawer;
+import com.wix.reactnativenotifications.core.ReactAppLifecycleFacade;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,7 +67,12 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
 
     @Override
     public void onActivityStarted(Activity activity) {
-        if (InitialNotificationHolder.getInstance().get() == null) {
+          boolean isReactInitialized = false;
+        if (AppLifecycleFacadeHolder.get() instanceof ReactAppLifecycleFacade) {
+            isReactInitialized = AppLifecycleFacadeHolder.get().isReactInitialized();
+        }
+
+        if (InitialNotificationHolder.getInstance().get() == null && !isReactInitialized) {
             callOnOpenedIfNeed(activity);
         }
     }
@@ -95,8 +101,7 @@ public class RNNotificationsPackage implements ReactPackage, AppLifecycleFacade.
         Intent intent = activity.getIntent();
         if (NotificationIntentAdapter.canHandleIntent(intent)) {
             Context appContext = mApplication.getApplicationContext();
-            Bundle notificationData = NotificationIntentAdapter.canHandleTrampolineActivity(appContext) ?
-                    intent.getExtras() : NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent);
+            Bundle notificationData = NotificationIntentAdapter.extractPendingNotificationDataFromIntent(intent);
             final IPushNotification pushNotification = PushNotification.get(appContext, notificationData);
             if (pushNotification != null) {
                 pushNotification.onOpened();
