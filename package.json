@@ -1,6 +1,6 @@
 {
   "name": "@imatis/react-native-notifications",
-  "version": "4.3.3-imatis.7",
+  "version": "4.3.3-imatis.8",
   "description": "Advanced Push Notifications (Silent, interactive notifications) for iOS & Android",
   "license": "MIT",
   "keywords": [
